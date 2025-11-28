@@ -1,0 +1,36 @@
+package bookstore.analyzers.simple;
+
+import bookstore.models.Book;
+
+public class SimpleBookDensityAnalyzer {
+    private java.util.List<Book> books;
+    private Book mostDenseBook;
+    private double maxDensity;
+
+    public void analyze(java.util.List<Book> books) {
+        this.books = books;
+        this.mostDenseBook = null;
+        this.maxDensity = 0.0;
+
+        for (Book book : books) {
+            double density = calculateDensity(book);
+            if (density > maxDensity) {
+                maxDensity = density;
+                mostDenseBook = book;
+            }
+        }
+    }
+
+    public void printResults() {
+        if (mostDenseBook != null) {
+            System.out.println("Самая плотная книга: " + mostDenseBook.getTitle() +
+                               ", плотность: " + String.format("%.2f", maxDensity) + " г/см³");
+        } else {
+            System.out.println("Нет книг для анализа.");
+        }
+    }
+
+    private double calculateDensity(Book book) {
+        return book.getVolume() > 0 ? book.getMass() / book.getVolume() : 0.0;
+    }
+}

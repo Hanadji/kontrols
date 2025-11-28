@@ -1,0 +1,36 @@
+package bookstore.analyzers.simple;
+
+public class SimpleRevenueAnalyzer {
+    private double[][] revenueData;
+    private double[] departmentTotals;
+    private String[] departmentNames;
+
+    public void calculateDepartmentRevenue(double[][] data, String[] names) {
+        this.revenueData = data;
+        this.departmentNames = names;
+        this.departmentTotals = new double[data.length];
+
+        for (int dept = 0; dept < data.length; dept++) {
+            double sum = 0.0;
+            for (int day = 0; day < data[dept].length; day++) {
+                sum += data[dept][day];
+            }
+            departmentTotals[dept] = sum;
+        }
+    }
+
+    public void printRevenueReport() {
+        for (int i = 0; i < departmentNames.length; i++) {
+            System.out.println("Отдел '" + departmentNames[i] + "': " +
+                               String.format("%.0f", departmentTotals[i]) + " руб.");
+        }
+    }
+
+    public double getTotalRevenue() {
+        double total = 0.0;
+        for (double sum : departmentTotals) {
+            total += sum;
+        }
+        return total;
+    }
+}

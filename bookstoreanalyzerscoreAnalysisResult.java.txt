@@ -1,0 +1,36 @@
+package bookstore.analyzers.core;
+
+public class AnalysisResult {
+    private String analysisType;
+    private Object resultData;
+    private boolean success;
+    private String message;
+
+    public AnalysisResult(String type, Object data, boolean success) {
+        this.analysisType = type;
+        this.resultData = data;
+        this.success = success;
+        this.message = success ? "Анализ успешно завершен" : "Ошибка при анализе";
+    }
+
+    public boolean isSuccessful() {
+        return success;
+    }
+
+    public String getFormattedResult() {
+        return "Тип: " + analysisType + " | Успех: " + success +
+               " | Данные: " + resultData + " | Сообщение: " + message;
+    }
+
+    public void saveToFile(String filename) throws java.io.IOException {
+        java.io.FileWriter writer = new java.io.FileWriter(filename);
+        writer.write(getFormattedResult());
+        writer.close();
+    }
+
+    // Геттеры
+    public String getAnalysisType() { return analysisType; }
+    public Object getResultData() { return resultData; }
+    public boolean isSuccess() { return success; }
+    public String getMessage() { return message; }
+}

@@ -1,0 +1,7 @@
+package bookstore.analyzers.core;
+
+public interface ReportGenerator {
+    void generateReport();
+    void exportResults(String filename);
+    String getReportSummary();
+}

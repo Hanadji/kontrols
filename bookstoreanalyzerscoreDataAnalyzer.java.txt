@@ -1,0 +1,27 @@
+package bookstore.analyzers.core;
+
+public abstract class DataAnalyzer {
+    protected String analyzerName;
+    protected AnalysisResult result;
+    protected boolean analysisCompleted;
+
+    public DataAnalyzer(String name) {
+        this.analyzerName = name;
+        this.analysisCompleted = false;
+    }
+
+    public abstract void performAnalysis();
+
+    public void displayBasicInfo() {
+        System.out.println("Анализатор: " + analyzerName + " | Выполнен: " + analysisCompleted);
+    }
+
+    public AnalysisResult getResult() {
+        return result;
+    }
+
+    protected void setResult(Object data, String type) {
+        this.result = new AnalysisResult(type, data, true);
+        this.analysisCompleted = true;
+    }
+}

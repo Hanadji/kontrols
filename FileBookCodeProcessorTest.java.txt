@@ -1,0 +1,46 @@
+import bookstore.analyzers.advanced.FileBookCodeProcessor;
+
+public class FileBookCodeProcessorTest {
+    public static void main(String[] args) {
+        // 1. Создаём тестовый файл
+        createTestFile("books.dat");
+
+        FileBookCodeProcessor processor = new FileBookCodeProcessor();
+
+        // 2. Проверка валидации
+        System.out.println("Валидация books.dat: " + processor.validateFileFormat("books.dat"));
+        System.out.println("Валидация несуществующего: " + processor.validateFileFormat("nope.txt"));
+
+        // 3. Чтение и анализ
+        try {
+            processor.readData("books.dat");
+            System.out.println("Статистика после чтения: " + processor.getProcessingStats());
+            processor.performAnalysis();
+            processor.displayBasicInfo();
+        } catch (java.io.IOException e) {
+            System.err.println("Ошибка чтения: " + e.getMessage());
+        }
+
+        // 4. Генерация отчёта
+        processor.generateReport();
+        System.out.println("Краткий отчёт: " + processor.getReportSummary());
+
+        // 5. Экспорт
+        processor.exportResults("output");
+
+        // 6. Проверка разделения
+        System.out.println("Чётных: " + processor.getResult().getResultData());
+    }
+
+    private static void createTestFile(String filename) {
+        try {
+            java.io.PrintWriter writer = new java.io.PrintWriter(filename);
+            int[] codes = {101, 202, 303, 404, 505, 606, 707, 808, 909, 1010,
+                          11, 22, 33, 44, 55, 66, 77, 88, 99, 100};
+            for (int c : codes) writer.println(c);
+            writer.close();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

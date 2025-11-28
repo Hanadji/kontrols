@@ -1,0 +1,34 @@
+package bookstore.analyzers.simple;
+
+public class SimpleSalesAnalyzer {
+    private int[] dailySales;
+    private java.util.List<Integer> peakDays;
+    private int peakCount;
+
+    public void analyzeSalesPeaks(int[] sales) {
+        this.dailySales = sales;
+        this.peakDays = new java.util.ArrayList<>();
+        this.peakCount = 0;
+
+        for (int i = 0; i < sales.length - 1; i++) {
+            if (isPeak(sales[i], sales[i + 1])) {
+                peakDays.add(i + 1); // день = индекс + 1 (1-й день → индекс 0)
+                peakCount++;
+            }
+        }
+    }
+
+    public void displayAnalysis() {
+        StringBuilder sb = new StringBuilder("Дни с пиком: ");
+        for (int i = 0; i < peakDays.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(peakDays.get(i));
+        }
+        sb.append(" | Всего: ").append(peakCount).append(" дня");
+        System.out.println(sb.toString());
+    }
+
+    private boolean isPeak(int currentDay, int nextDay) {
+        return currentDay > nextDay;
+    }
+}

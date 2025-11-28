@@ -1,0 +1,148 @@
+package bookstore.analyzers.advanced;
+
+import bookstore.analyzers.core.DataAnalyzer;
+import bookstore.analyzers.core.ReportGenerator;
+import bookstore.analyzers.core.FileProcessor;
+import bookstore.analyzers.core.AnalysisResult;
+
+import java.util.*;
+
+public class FileBookCodeProcessor extends DataAnalyzer
+        implements FileProcessor, ReportGenerator {
+
+    private java.util.List<Integer> allCodes;
+    private java.util.List<Integer> evenCodes;
+    private java.util.List<Integer> oddCodes;
+    private String currentFilename;
+
+    private int minCode;
+    private int maxCode;
+    private double avgCode;
+    private int totalProcessed;
+
+    public FileBookCodeProcessor() {
+        super("FileBookCodeProcessor");
+        this.allCodes = new java.util.ArrayList<>();
+        this.evenCodes = new java.util.ArrayList<>();
+        this.oddCodes = new java.util.ArrayList<>();
+        this.totalProcessed = 0;
+    }
+
+    @Override
+    public void performAnalysis() {
+        if (!allCodes.isEmpty()) {
+            separateEvenOddCodes();
+            calculateStatistics();
+            java.util.Map<String, Object> stats = new java.util.HashMap<>();
+            stats.put("total", allCodes.size());
+            stats.put("even", evenCodes.size());
+            stats.put("odd", oddCodes.size());
+            stats.put("min", minCode);
+            stats.put("max", maxCode);
+            stats.put("avg", String.format("%.2f", avgCode));
+            setResult(stats, "BOOK_CODE_ANALYSIS");
+        } else {
+            result = new AnalysisResult("BOOK_CODE_ANALYSIS", null, false);
+        }
+    }
+
+    @Override
+    public void readData(String filename) throws java.io.IOException {
+        currentFilename = filename;
+        allCodes.clear();
+        java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(filename));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+            if (!line.isEmpty()) {
+                try {
+                    int code = Integer.parseInt(line);
+                    validateCode(code);
+                    allCodes.add(code);
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        reader.close();
+        totalProcessed++;
+    }
+
+    @Override
+    public void writeData(String filename) throws java.io.IOException {
+        java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename));
+        for (int code : evenCodes) {
+            writer.println(code);
+        }
+        writer.close();
+    }
+
+    @Override
+    public String getProcessingStats() {
+        return "Обработано файлов: " + totalProcessed + ", Кодов: " + allCodes.size();
+    }
+
+    @Override
+    public boolean validateFileFormat(String filename) {
+        java.io.File file = new java.io.File(filename);
+        return file.exists() && file.canRead();
+    }
+
+    @Override
+    public void generateReport() {
+        System.out.println("=== ОТЧЕТ АНАЛИЗА КОДОВ КНИГ ===");
+        System.out.println("Файл: " + currentFilename);
+        System.out.println("Всего кодов: " + allCodes.size());
+        System.out.println("Чётных: " + evenCodes.size() + " | Нечётных: " + oddCodes.size());
+        if (!allCodes.isEmpty()) {
+            System.out.println("Мин: " + minCode + " | Макс: " + maxCode + " | Ср.: " + String.format("%.2f", avgCode));
+        }
+        if (result != null) {
+            System.out.println("Статус: " + (result.isSuccessful() ? "УСПЕХ" : "ОШИБКА"));
+        }
+    }
+
+    @Override
+    public void exportResults(String baseName) {
+        try {
+            writeData(baseName + "_even.txt");
+            java.io.PrintWriter oddWriter = new java.io.PrintWriter(baseName + "_odd.txt");
+            for (int code : oddCodes) oddWriter.println(code);
+            oddWriter.close();
+        } catch (java.io.IOException e) {
+            System.err.println("Ошибка экспорта: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String getReportSummary() {
+        if (allCodes.isEmpty()) return "Нет данных";
+        return "Кодов: " + allCodes.size() + " | Чётных: " + evenCodes.size();
+    }
+
+    // Вспомогательные методы
+    private void separateEvenOddCodes() {
+        evenCodes.clear();
+        oddCodes.clear();
+        for (int code : allCodes) {
+            if (code % 2 == 0) {
+                evenCodes.add(code);
+            } else {
+                oddCodes.add(code);
+            }
+        }
+    }
+
+    private void calculateStatistics() {
+        if (allCodes.isEmpty()) return;
+        minCode = java.util.Collections.min(allCodes);
+        maxCode = java.util.Collections.max(allCodes);
+        long sum = 0;
+        for (int c : allCodes) sum += c;
+        avgCode = (double) sum / allCodes.size();
+    }
+
+    private void validateCode(int code) {
+        if (code < 0) {
+            throw new IllegalArgumentException("Код книги не может быть отрицательным: " + code);
+        }
+    }
+}

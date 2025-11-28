@@ -1,0 +1,8 @@
+package bookstore.analyzers.core;
+
+public interface FileProcessor {
+    void readData(String filename) throws java.io.IOException;
+    void writeData(String filename) throws java.io.IOException;
+    String getProcessingStats();
+    boolean validateFileFormat(String filename);
+}
